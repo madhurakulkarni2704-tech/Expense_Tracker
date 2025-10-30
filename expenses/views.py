@@ -6,12 +6,12 @@ from .forms import ExpenseForm
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
 
-@login_required
+#@login_required
 def expense_list(request):
     expenses = Expense.objects.filter(user=request.user)
     return render(request, 'expenses/expense_list.html', {'expenses': expenses})
 
-@login_required
+#@login_required
 def add_expense(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
@@ -24,20 +24,32 @@ def add_expense(request):
         form = ExpenseForm()
     return render(request, 'expenses/add_expense.html', {'form': form})
 
-@login_required
+#@login_required
 def edit_expense(request, expense_id):
-    expense = get_object_or_404(Expense, id=expense_id, user=request.user)
-    if request.method == 'POST':
-        form = ExpenseForm(request.POST, instance=expense)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Expense updated successfully!")
-            return redirect('expense_list')
-    else:
-        form = ExpenseForm(instance=expense)
-    return render(request, 'expenses/edit_expense.html', {'form': form})
+    expense = get_object_or_404(Expense, id=expense_id)
 
-@login_required
+    if request.method == 'POST':
+        expense.title = request.POST.get('title')
+        expense.amount = request.POST.get('amount')
+        expense.date = request.POST.get('date')
+        expense.category = request.POST.get('category')
+        expense.description = request.POST.get('description')
+        expense.save()
+        return redirect('expense_list')
+
+    return render(request, 'expenses/edit_expense.html', {'expense': expense})
+##def edit_expense(request, expense_id):
+    #expense = get_object_or_404(Expense, id=expense_id, user=request.user)
+    #if request.method == 'POST':
+        #form = ExpenseForm(request.POST, instance=expense)
+        #if form.is_valid():
+           # form.save()
+           # return redirect('expense_list')
+    #else:
+        #form = ExpenseForm(instance=expense)
+    #return render(request, 'expenses/edit_expense.html', {'form': form})
+
+#@login_required
 def delete_expense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
     if request.method == 'POST':
