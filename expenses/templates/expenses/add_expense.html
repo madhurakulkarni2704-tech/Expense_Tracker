@@ -1,105 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Expense</title>
+{% extends 'expenses/base.html' %}
+{% load static %}
+{% block title %}Add Expense - SmartExpense{% endblock %}
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block content %}
+<div class="container">
+  <div class="expense-form card p-4 shadow-sm mx-auto" style="max-width: 600px; border-radius: 12px;">
+    <h3 class="text-center text-success mb-4">Add New Expense</h3>
 
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Poppins', sans-serif;
-    }
-    .expense-form {
-      max-width: 600px;
-      margin: 60px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      padding: 30px;
-    }
-    .expense-form h3 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #198754;
-      font-weight: 600;
-    }
-    .form-label {
-      font-weight: 500;
-    }
-    .btn-success {
-      width: 100%;
-      background-color: #198754;
-      border: none;
-      font-weight: 500;
-    }
-    .btn-success:hover {
-      background-color: #157347;
-    }
-    .btn-secondary {
-      width: 100%;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-    <div class="expense-form">
-      <h3>Add New Expense</h3>
-
-      <form method="POST">
-        {% csrf_token %}
-
-        <!-- Title -->
-        <div class="mb-3">
-          <label for="title" class="form-label">Title</label>
-          <input type="text" name="title" id="title" class="form-control" placeholder="Enter expense title" required>
-        </div>
-
-        <!-- Amount -->
-        <div class="mb-3">
-          <label for="amount" class="form-label">Amount</label>
-          <input type="number" name="amount" id="amount" class="form-control" placeholder="Enter amount" step="0.01" required>
-        </div>
-
-        <!-- Date -->
-        <div class="mb-3">
-          <label for="date" class="form-label">Date</label>
-          <input type="date" name="date" id="date" class="form-control" required>
-        </div>
-
-        <!-- Category -->
-        <div class="mb-3">
-          <label for="category" class="form-label">Category</label>
-          <select name="category" id="category" class="form-select" required>
-            <option value="" disabled selected>Select category</option>
-            <option value="Food">Food</option>
-            <option value="Transport">Transport</option>
-            <option value="Shopping">Shopping</option>
-            <option value="Bills">Bills</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <!-- Description -->
-        <div class="mb-3">
-          <label for="description" class="form-label">Description</label>
-          <textarea name="description" id="description" class="form-control" rows="3" placeholder="Enter description (optional)"></textarea>
-        </div>
-
-        <!-- Buttons -->
-        <button type="submit" class="btn btn-success">Add Expense</button>
-        <a href="{% url 'expense_list' %}" class="btn btn-secondary">Back</a>
-      </form>
+    <!-- Budget warning -->
+    <div id="budget-warning" class="alert alert-warning d-none">
+      Adding this expense will exceed your budget.
     </div>
-  </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Django form -->
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+        {{ form.title }}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.amount.id_for_label }}" class="form-label">Amount</label>
+        {{ form.amount }}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+        {{ form.date }}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+        {{ form.category }}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+        {{ form.description }}
+      </div>
+
+      <!-- Buttons -->
+      <button type="submit" class="btn btn-success w-100">Add Expense</button>
+      <a href="{% url 'expense_list' %}" class="btn btn-secondary w-100 mt-2">Back</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Fetch current month's total and warn if exceeding budget
+  let currentMonthTotal = 0;
+  fetch("{% url 'month_total_api' %}")
+    .then(r => r.json())
+    .then(d => currentMonthTotal = d.month_total);
+
+  const amt = document.querySelector('input[name="amount"]');
+  const warn = document.getElementById('budget-warning');
+  const monthlyBudget = JSON.parse('{{ monthly_budget_amount|default:"null"|escapejs }}');
+
+  if (amt) {
+    amt.addEventListener('input', () => {
+      const val = parseFloat(amt.value || 0);
+      if (monthlyBudget && (currentMonthTotal + val) >= monthlyBudget) {
+        warn.classList.remove('d-none');
+      } else {
+        warn.classList.add('d-none');
+      }
+    });
+  }
+</script>
+{% endblock %}

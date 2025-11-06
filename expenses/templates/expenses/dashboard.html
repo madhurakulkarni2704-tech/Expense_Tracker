@@ -1,0 +1,154 @@
+{% extends 'expenses/base.html' %}
+{% load static %}
+{% block title %}Dashboard - SmartExpense{% endblock %}
+
+{% block extra_head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Dashboard</h2>
+  <a href="{% url 'add_expense' %}" class="btn btn-primary">Add Expense</a>
+</div>
+
+<!-- Top summary cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm">
+      <div class="small text-muted">Total Spent</div>
+      <div class="d-flex align-items-end justify-content-between">
+        <h3 class="mb-0">₹{{ overall_total|floatformat:2 }}</h3>
+        <small class="text-muted">All time</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm">
+      <div class="small text-muted">Total Categories</div>
+      <h3 class="mb-0">{{ total_categories }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 shadow-sm">
+      <div class="small text-muted">Months shown</div>
+      <h3 class="mb-0">{{ months_shown }}</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Budget alert -->
+{% if monthly_budget_amount %}
+  {% if budget_alert %}
+    <div class="alert alert-danger d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <strong>Budget exceeded!</strong> You've spent ₹{{ this_month_total|floatformat:2 }} of ₹{{ monthly_budget_amount|floatformat:2 }} this month ({{ budget_percent|floatformat:0 }}%).
+      </div>
+      <a href="{% url 'add_expense' %}" class="btn btn-sm btn-outline-light">Add expense</a>
+    </div>
+  {% else %}
+    <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+      <div>
+        You're at ₹{{ this_month_total|floatformat:2 }} of ₹{{ monthly_budget_amount|floatformat:2 }} this month ({{ budget_percent|floatformat:0 }}%).
+      </div>
+      <a href="{% url 'add_expense' %}" class="btn btn-sm btn-primary">Add expense</a>
+    </div>
+  {% endif %}
+{% endif %}
+
+<!-- Charts row -->
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card p-3 shadow-sm">
+      <h5>Spending Over Time</h5>
+      <canvas id="spendingChart" height="150"></canvas>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card p-3 shadow-sm">
+      <h5>By Category</h5>
+      <canvas id="categoryChart" height="150"></canvas>
+      <div class="mt-3">
+        <!-- legend will live here if you want -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- category breakdown table & action buttons -->
+<div class="row mt-4">
+  <div class="col-lg-8">
+    <div class="card p-3 shadow-sm">
+      <h5>Category Breakdown</h5>
+      <table class="table table-borderless mb-0">
+        <thead><tr><th>Category</th><th class="text-end">Total</th></tr></thead>
+        <tbody>
+          {% for c in cat_qs %}
+            <tr>
+              <td>{{ c.category__name|default:"Uncategorized" }}</td>
+              <td class="text-end">₹{{ c.total|floatformat:2 }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="2">No data yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card p-3 shadow-sm">
+      <h6>Quick Actions</h6>
+      <div class="d-grid gap-2">
+        <a href="{% url 'add_expense' %}" class="btn btn-primary btn-sm">Add Expense</a>
+        <a href="{% url 'expense_list' %}" class="btn btn-outline-secondary btn-sm">View Expenses</a>
+        <a href="{% url 'export_csv' %}" class="btn btn-outline-success btn-sm">Export CSV</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+
+<script>
+  const monthLabels = JSON.parse('{{ month_labels_json|escapejs }}');
+  const monthTotals = JSON.parse('{{ month_totals_json|escapejs }}');
+  const categories = JSON.parse('{{ categories_json|escapejs }}');
+  const categoryAmounts = JSON.parse('{{ category_amounts_json|escapejs }}');
+
+  // Spending bar chart
+  const ctx = document.getElementById('spendingChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        label: 'Spent (₹)',
+        data: monthTotals,
+        /* styling left to Chart.js defaults so colors adapt to theme */
+        barPercentage: 0.6,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: function(v){ return '₹' + v } } }
+      }
+    }
+  });
+
+  // Category doughnut
+  const ctx2 = document.getElementById('categoryChart').getContext('2d');
+  new Chart(ctx2, {
+    type: 'doughnut',
+    data: { labels: categories, datasets: [{ data: categoryAmounts }] },
+    options: { responsive: true, plugins: { legend: { position: 'right' } } }
+  });
+</script>
+{% endblock %}
