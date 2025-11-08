@@ -9,14 +9,33 @@ from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
+from django.contrib.auth import login
 from .models import Expense, Category, Budget
-from .forms import ExpenseForm, BudgetForm
+from .forms import ExpenseForm, BudgetForm, RegisterForm
+
+# ------------------------
+# User Registration
+# ------------------------
+def register_view(request):
+    """Handles user signup."""
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Automatically log the user in
+            messages.success(request, f"Welcome {user.username}! Your account has been created.")
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = RegisterForm()
+    return render(request, 'users/register.html', {'form': form})
 
 
 # ------------------------
 # Dashboard View
 # ------------------------
-#@login_required
+@login_required
 def dashboard(request):
     user = request.user
     qs = Expense.objects.filter(user=user)
@@ -94,8 +113,7 @@ def dashboard(request):
 # ------------------------
 # CRUD Operations
 # ------------------------
-
-#@login_required
+@login_required
 def expense_list(request):
     qs = Expense.objects.filter(user=request.user).order_by('-date')
 
@@ -119,7 +137,7 @@ def expense_list(request):
     return render(request, 'expenses/expense_list.html', {'expenses': expenses, 'q': q, 'start': start, 'end': end})
 
 
-#@login_required
+@login_required
 def add_expense(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
@@ -145,7 +163,7 @@ def add_expense(request):
     return render(request, 'expenses/add_expense.html', {'form': form})
 
 
-#@login_required
+@login_required
 def edit_expense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
     if request.method == 'POST':
@@ -159,7 +177,7 @@ def edit_expense(request, expense_id):
     return render(request, 'expenses/edit_expense.html', {'form': form})
 
 
-#@login_required
+@login_required
 def delete_expense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
     if request.method == 'POST':
@@ -172,15 +190,14 @@ def delete_expense(request, expense_id):
 # ------------------------
 # Extra Utilities
 # ------------------------
-
-#@login_required
+@login_required
 def month_total_api(request):
     start = date.today().replace(day=1)
     total = Expense.objects.filter(user=request.user, date__gte=start).aggregate(total=Sum('amount'))['total'] or 0
     return JsonResponse({'month_total': float(total)})
 
 
-#@login_required
+@login_required
 def export_csv(request):
     qs = Expense.objects.filter(user=request.user).order_by('-date')
     response = HttpResponse(content_type='text/csv')

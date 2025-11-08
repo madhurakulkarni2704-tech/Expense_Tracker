@@ -1,7 +1,10 @@
 # expenses/forms.py
 from django import forms
 from .models import Expense, Budget
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
+# ---------------- Expense Form ---------------- #
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
@@ -30,7 +33,7 @@ class ExpenseForm(forms.ModelForm):
             }),
         }
 
-# Optional: keep BudgetForm (for alerts and budgets)
+# ---------------- Budget Form ---------------- #
 class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
@@ -47,4 +50,19 @@ class BudgetForm(forms.ModelForm):
             'category': forms.Select(attrs={
                 'class': 'form-select'
             }),
+        }
+
+# ---------------- User Registration Form ---------------- #
+#8 nov 2025
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email address'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'}),
         }
