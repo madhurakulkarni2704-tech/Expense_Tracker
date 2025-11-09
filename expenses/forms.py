@@ -53,7 +53,7 @@ class BudgetForm(forms.ModelForm):
         }
 
 # ---------------- User Registration Form ---------------- #
-#8 nov 2025
+#8 nov 2025 new 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
 

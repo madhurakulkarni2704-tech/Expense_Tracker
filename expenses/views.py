@@ -14,7 +14,7 @@ from .models import Expense, Category, Budget
 from .forms import ExpenseForm, BudgetForm, RegisterForm
 
 # ------------------------
-# User Registration
+# User Registration new 9 nov
 # ------------------------
 def register_view(request):
     """Handles user signup."""

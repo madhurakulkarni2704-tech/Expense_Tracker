@@ -38,7 +38,7 @@ class Budget(models.Model):
     def __str__(self):
         return f"{self.user} - {self.month:%b %Y} - {self.amount}"
     
-    # 8 nov 2025
+    # 8 nov 2025 new one
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
