@@ -11,6 +11,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),         # main dashboard with graphs
     path('api/month_total/', views.month_total_api, name='month_total_api'),  # AJAX API for month total
     path('export/csv/', views.export_csv, name='export_csv'),   
-    path('register/', views.register_view, name='register'),#8 nov 2025 new
+    #path('register/', views.register_view, name='register'),#8 nov 2025 new
     # CSV export
 ]

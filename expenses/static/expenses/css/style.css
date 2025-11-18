@@ -12,3 +12,43 @@ h2, h3, h4 { color: #0b1220; }
 @media (max-width: 768px) {
   .card-chart { min-height: 220px; }
 }
+
+/* style.css – applied globally via base.html */
+
+body {
+  background: linear-gradient(135deg, #f0f3f7, #e5e9ee);
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+.card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004999;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  font-weight: 500;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}

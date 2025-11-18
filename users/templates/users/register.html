@@ -81,6 +81,15 @@
                     {% endif %}
                 </div>
 
+                <!-- Email -->
+<div class="mb-3">
+    {{ form.email.label_tag }}
+    {{ form.email|add_class:"form-control" }}
+    {% if form.email.errors %}
+        <div class="error">{{ form.email.errors }}</div>
+    {% endif %}
+</div>
+
                 <!-- Password1 -->
                 <div class="mb-3">
                     {{ form.password1.label_tag }}

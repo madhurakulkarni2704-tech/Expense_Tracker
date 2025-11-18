@@ -45,6 +45,8 @@ INSTALLED_APPS = [
    # 'expenses.apps.ExpensesConfig',
 ]
 
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,6 +56,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 
 ROOT_URLCONF = 'tracker.urls'
 
@@ -135,9 +142,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Where to redirect after login/logout
 #8 nov 2025
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/login/'
-LOGIN_URL = '/login/'   # used by @login_required
+# Authentication Redirects
+LOGIN_URL = '/users/login/'
+LOGOUT_REDIRECT_URL = '/users/login/'
+LOGIN_REDIRECT_URL = '/expenses/dashboard/'
+ # used by @login_required
 
 #9th nov 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

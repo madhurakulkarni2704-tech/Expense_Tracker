@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Expense</title>
+{% extends 'expenses/base.html' %}
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Add Expense{% endblock %}
 
-  <style>
+{% block extra_head %}
+<style>
     body {
       background-color: #f8f9fa;
       font-family: 'Poppins', sans-serif;
@@ -21,85 +16,68 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       padding: 30px;
     }
-    .expense-form h3 {
+    h3 {
       text-align: center;
       margin-bottom: 25px;
       color: #198754;
       font-weight: 600;
     }
-    .form-label {
-      font-weight: 500;
-    }
-    .btn-success {
-      width: 100%;
-      background-color: #198754;
-      border: none;
-      font-weight: 500;
-    }
-    .btn-success:hover {
-      background-color: #157347;
-    }
-    .btn-secondary {
-      width: 100%;
-      margin-top: 10px;
-    }
-  </style>
-</head>
+</style>
+{% endblock %}
 
-<body>
-  <div class="container">
+{% block content %}
+<div class="container">
     <div class="expense-form">
-      <h3>Add New Expense</h3>
 
-      <form method="POST">
-        {% csrf_token %}
+        <h3>Add New Expense</h3>
 
-        <!-- Title -->
-        <div class="mb-3">
-          <label for="title" class="form-label">Title</label>
-          <input type="text" name="title" id="title" class="form-control" placeholder="Enter expense title" required>
-        </div>
+        <!-- Show Django success / error messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mt-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-        <!-- Amount -->
-        <div class="mb-3">
-          <label for="amount" class="form-label">Amount</label>
-          <input type="number" name="amount" id="amount" class="form-control" placeholder="Enter amount" step="0.01" required>
-        </div>
+        <form method="POST">
+            {% csrf_token %}
 
-        <!-- Date -->
-        <div class="mb-3">
-          <label for="date" class="form-label">Date</label>
-          <input type="date" name="date" id="date" class="form-control" required>
-        </div>
+            <!-- Render Django form fields (already styled in forms.py) -->
+            <div class="mb-3">
+              {{ form.title.label_tag }}
+              {{ form.title }}
+            </div>
 
-        <!-- Category -->
-        <div class="mb-3">
-          <label for="category" class="form-label">Category</label>
-          <select name="category" id="category" class="form-select" required>
-            <option value="" disabled selected>Select category</option>
-            <option value="Food">Food</option>
-            <option value="Transport">Transport</option>
-            <option value="Shopping">Shopping</option>
-            <option value="Bills">Bills</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+            <div class="mb-3">
+              {{ form.amount.label_tag }}
+              {{ form.amount }}
+            </div>
 
-        <!-- Description -->
-        <div class="mb-3">
-          <label for="description" class="form-label">Description</label>
-          <textarea name="description" id="description" class="form-control" rows="3" placeholder="Enter description (optional)"></textarea>
-        </div>
+            <div class="mb-3">
+              {{ form.date.label_tag }}
+              {{ form.date }}
+            </div>
 
-        <!-- Buttons -->
-        <button type="submit" class="btn btn-success">Add Expense</button>
-        <a href="{% url 'expense_list' %}" class="btn btn-secondary">Back</a>
-      </form>
+            <!-- Category FIX -->
+            <div class="mb-3">
+              {{ form.category.label_tag }}
+              {{ form.category }}
+            </div>
+
+            <div class="mb-3">
+              {{ form.description.label_tag }}
+              {{ form.description }}
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Add Expense</button>
+
+            <!-- BACK BUTTON NOW WORKS -->
+            <a href="{% url 'expense_list' %}" class="btn btn-secondary w-100 mt-2">
+                Back
+            </a>
+        </form>
+
     </div>
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

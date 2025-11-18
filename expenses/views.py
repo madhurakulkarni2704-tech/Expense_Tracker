@@ -16,8 +16,8 @@ from .forms import ExpenseForm, BudgetForm, RegisterForm
 # ------------------------
 # User Registration new 9 nov
 # ------------------------
-def register_view(request):
-    """Handles user signup."""
+"""def register_view(request):
+    #Handles user signup.
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -31,7 +31,7 @@ def register_view(request):
         form = RegisterForm()
     return render(request, 'users/register.html', {'form': form})
 
-
+"""
 # ------------------------
 # Dashboard View
 # ------------------------
@@ -92,6 +92,9 @@ def dashboard(request):
         if budget_percent >= 100:
             budget_alert = True
 
+    recent_expenses = Expense.objects.filter(user=request.user).order_by('-date')[:10]
+
+
     context = {
         'overall_total': float(overall),
         'categories_json': json.dumps(categories),
@@ -100,12 +103,14 @@ def dashboard(request):
         'month_totals_json': json.dumps(month_totals),
         'cat_qs': cat_qs,
         'monthly_qs': monthly_qs,
+        'recent_expenses': recent_expenses,
         'this_month_total': this_month_total,
         'monthly_budget_amount': monthly_budget_amount,
         'budget_alert': budget_alert,
         'budget_percent': budget_percent,
         'total_categories': cat_qs.count(),
         'months_shown': len(month_labels),
+        'username': request.user.username,
     }
     return render(request, 'expenses/dashboard.html', context)
 

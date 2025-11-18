@@ -3,45 +3,38 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-from .forms import CustomUserCreationForm  # make sure this form exists
+from expenses.forms import RegisterForm
+
 
 # ------------------ REGISTER VIEW ------------------ #
 def register(request):
-    """
-    Handles new user registration.
-    Uses your CustomUserCreationForm to create users safely.
-    """
     if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # auto-login after registration
-            messages.success(request, f"Welcome, {user.username}! Your account has been created.")
-            return redirect('dashboard')  # go to dashboard after signup
-        else:
-            messages.error(request, "Please correct the errors below.")
+            # Do NOT auto-login here. Redirect to login page with success message.
+            messages.success(request, 'Registration successful. Please log in.')
+            return redirect('login')
     else:
-        form = CustomUserCreationForm()
+        form = RegisterForm()
 
     return render(request, 'users/register.html', {'form': form})
 
 
+
 # ------------------ LOGIN VIEW ------------------ #
 def user_login(request):
-    """
-    Authenticates users using Django's built-in AuthenticationForm.
-    """
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
+
             user = authenticate(username=username, password=password)
 
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Welcome back, {username}!")
-                return redirect('dashboard')  # go to dashboard after login
+                return redirect('dashboard')
             else:
                 messages.error(request, "Invalid username or password.")
         else:
@@ -50,7 +43,6 @@ def user_login(request):
         form = AuthenticationForm()
 
     return render(request, 'users/login.html', {'form': form})
-
 
 # ------------------ LOGOUT VIEW ------------------ #
 def user_logout(request):
