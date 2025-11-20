@@ -171,16 +171,25 @@ def add_expense(request):
 @login_required
 def edit_expense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
-    if request.method == 'POST':
-        form = ExpenseForm(request.POST, instance=expense)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Expense updated successfully!')
-            return redirect('expense_list')
-    else:
-        form = ExpenseForm(instance=expense)
-    return render(request, 'expenses/edit_expense.html', {'form': form})
 
+    if request.method == "POST":
+        # Read values manually from input fields
+        expense.title = request.POST.get("title")
+        expense.amount = request.POST.get("amount")
+        expense.date = request.POST.get("date")
+        expense.description = request.POST.get("description")
+
+        # Category handling:
+        category_name = request.POST.get("category")
+        if category_name:
+            category_obj, created = Category.objects.get_or_create(name=category_name)
+            expense.category = category_obj
+
+        expense.save()
+        messages.success(request, "Expense updated successfully!")
+        return redirect("expense_list")
+
+    return render(request, "expenses/edit_expense.html", {"expense": expense})
 
 @login_required
 def delete_expense(request, expense_id):

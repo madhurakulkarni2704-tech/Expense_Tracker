@@ -4,19 +4,10 @@
 
 {% block extra_head %}
 <style>
-    body {
-      background-color: #4e83b9;
-    }
-    .card {
-      border-radius: 15px;
-      box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
-    }
-    .form-label {
-      font-weight: 600;
-    }
-    .btn {
-      border-radius: 10px;
-    }
+    body { background-color: #4e83b9; }
+    .card { border-radius: 15px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1); }
+    .form-label { font-weight: 600; }
+    .btn { border-radius: 10px; }
 </style>
 {% endblock %}
 
@@ -25,7 +16,6 @@
     <div class="card p-4 mx-auto" style="max-width: 600px;">
         <h3 class="text-center mb-4 text-primary">Edit Expense</h3>
 
-        <!-- Show Django messages -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">{{ message }}</div>
@@ -36,39 +26,36 @@
             {% csrf_token %}
 
             <div class="mb-3">
-              <label class="form-label">Title</label>
-              <input type="text" name="title" class="form-control"
-                     value="{{ expense.title }}" required>
+                <label class="form-label">Title</label>
+                <input type="text" name="title" class="form-control" value="{{ expense.title }}" required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Amount</label>
-              <input type="number" name="amount" class="form-control"
-                     value="{{ expense.amount }}" step="0.01" required>
+                <label class="form-label">Amount</label>
+                <input type="number" name="amount" class="form-control"
+                       value="{{ expense.amount }}" step="0.01" required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Date</label>
-              <input type="date" name="date" class="form-control"
-                     value="{{ expense.date|date:'Y-m-d' }}" required>
+                <label class="form-label">Date</label>
+                <input type="date" name="date" class="form-control"
+                       value="{{ expense.date|date:'Y-m-d' }}" required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Category</label>
-              <input type="text" name="category" class="form-control"
-                     value="{{ expense.category }}" required>
+                <label class="form-label">Category</label>
+                <input type="text" name="category" class="form-control"
+                       value="{{ expense.category.name }}" required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Description</label>
-              <textarea name="description" class="form-control" rows="3">
-                {{ expense.description }}
-              </textarea>
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3">{{ expense.description }}</textarea>
             </div>
 
             <div class="d-flex justify-content-between">
-              <button type="submit" class="btn btn-success px-4">Update</button>
-              <a href="{% url 'expense_list' %}" class="btn btn-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-success px-4">Update</button>
+                <a href="{% url 'expense_list' %}" class="btn btn-secondary px-4">Cancel</a>
             </div>
         </form>
     </div>
